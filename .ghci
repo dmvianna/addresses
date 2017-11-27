@@ -1,0 +1,4 @@
+:set -XOverloadedStrings
+:set -fprint-potential-instances
+
+import Test.Hspec

@@ -1,0 +1,40 @@
+name:                addresses
+version:             0.1.0.0
+synopsis:            parsers for commonly used Australian street address types
+-- description:
+homepage:            https://github.com/dmvianna/addresses#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Daniel Vianna
+maintainer:          dmlvianna <at> gmail <dot> com
+copyright:           2017 Daniel Vianna
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Lib
+  build-depends:       base
+                     , bytestring
+                     , hspec
+                     , parsers
+                     , raw-strings-qq
+                     , text
+                     , trifecta
+  default-language:    Haskell2010
+
+test-suite address-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       addresses
+                     , base
+                     , bytestring
+                     , hspec
+  default-language:    Haskell2010
+  
+source-repository head
+  type:     git
+  location: https://github.com/dmvianna/addresses
