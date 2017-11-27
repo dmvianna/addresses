@@ -6,6 +6,7 @@ import           Control.Applicative
 import           Data.ByteString       (ByteString)
 import           Data.Char
 import qualified Data.Text             as T
+import Data.Text.Encoding
 import Data.Text (Text)
 import           Test.Hspec
 import           Text.Parser.LookAhead
@@ -46,8 +47,19 @@ postcodeEOF = do
 postcodeS :: Parser String
 postcodeS = do
   p <- count 4 digit
-  _ <- noneOf "0123456789"
+  _ <- lookAhead $ noneOf "0123456789"
   return p
 
 postcode :: Parser String
 postcode = postcodeEOF <|> postcodeS 
+
+exampleSuburb :: ByteString
+exampleSuburb = "narre warren east"
+
+-- T.words (decodeLatin1 exampleSuburb)
+
+foundPoint :: Parser Text
+foundPoint = do
+  p <- aPoint
+  _ <- eof
+  return p
