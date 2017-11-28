@@ -1,15 +1,15 @@
 
+{-# LANGUAGE OverloadedLists   #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE OverloadedLists #-}
 
 module Address where
 
 import           Control.Applicative
 import           Data.ByteString       (ByteString)
 import           Data.Char
+import           Data.Text             (Text)
 import qualified Data.Text             as T
-import Data.Text.Encoding
-import Data.Text (Text)
+import           Data.Text.Encoding
 import           Test.Hspec
 import           Text.Parser.LookAhead
 import           Text.RawString.QQ
@@ -73,7 +73,7 @@ postcodeS = do
   return p
 
 postcode :: Parser String
-postcode = postcodeEOF <|> postcodeS 
+postcode = postcodeEOF <|> postcodeS
 
 exampleSuburb :: ByteString
 exampleSuburb = "narre warren east"
@@ -103,7 +103,9 @@ main = hspec $ do
     it "parses 4 digits" $ do
       let (Success n) = parseByteString streetNumber mempty "1234B"
       n `shouldBe` "1234"
-    -- it "fails on 5 digits" $ do
-    --   case parseByteString streetNumber mempty "12345" of
-    --     Success _ -> fail "succeeded on 5 digits. That shouldn't happen."
-    --     Failure _ -> pure "success. move along."
+    it "fails on 5 digits" $ do
+      let (Failure (ErrInfo errDoc m)) =
+            parseByteString streetNumber mempty "12345"
+      show m `shouldBe` "[Columns 5 5]"
+
+
