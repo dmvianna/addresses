@@ -61,7 +61,7 @@ postcodeS = do
   return p
 
 postcode :: Parser String
-postcode = postcodeEOF <|> postcodeS
+postcode = try postcodeEOF <|> postcodeS
 
 foundPoint :: Parser Text
 foundPoint = do

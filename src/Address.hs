@@ -18,7 +18,7 @@ import           Test.Hspec
 import Components hiding (main)
 
 {-|
-Addresses are not standardised. Here is a not comprehensive list
+Addresses are not standardised. Here is a non comprehensive list
 of simple cases to look for:
 
 1. 12 The Horizon, Epping VIC 3076 -- We can consider 'The' as a prefix street type.
@@ -55,10 +55,14 @@ poBox = do
   box <- text "box"
   _ <- spaceOrStop
   n <- postcode
-  -- _ <- try $ lookAhead $ noneOf "k " <|> char 'k' >> oneOf " ," <|> text ""
+  _ <- spaceOrStop
+  _ <- skipOptional k
   case g of
     "g" -> return $ Gpo $ T.pack n
     _ -> return $ Po $ T.pack n
+
+k :: Parser Text
+k = try $ text "k " <|> text "k,"
 
 main :: IO ()
 main = hspec $ do
@@ -68,5 +72,8 @@ main = hspec $ do
       n `shouldBe` Po "1234"
     it "GPO box" $ do
       let (Success n) = parseByteString poBox mempty "gpo box 1234"
+      n `shouldBe` Gpo "1234"
+    it "skips the trailing 'k'" $ do
+      let (Success n) = parseByteString poBox mempty "gpo box 1234 k,"
       n `shouldBe` Gpo "1234"
     
