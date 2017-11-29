@@ -10,10 +10,12 @@ import           Data.Char
 import           Data.Text             (Text)
 import qualified Data.Text             as T
 import           Data.Text.Encoding
-import           Test.Hspec
 import           Text.Parser.LookAhead
 import           Text.RawString.QQ
 import           Text.Trifecta
+import           Test.Hspec
+
+import Components hiding (main)
 
 {-|
 Addresses are not standardised. Here is a not comprehensive list
@@ -29,83 +31,42 @@ might not be there at all. We may find `"12 Elizabeth Street"` or `"12 Elizabeth
 or `"12 Elizabeth Street VIC 3144"`.
 |-}
 
-exampleAddress :: ByteString
-exampleAddress = "12 nice view road, narre warren east, vic 3011"
+type Box = Text
 
--- parseByteString (commaSep $ many $ notChar ',') mempty exampleAddress
+type StreetNumber = Text
+type StreetName = Text
+type StreetType = Text
 
-commaList :: TokenParsing m => m [String]
-commaList = commaSep $ many $ notChar ','
+type City = Text
+type Postcode = Text
+type State = Text
 
-cardinalPoints :: CharParsing m => [m Text]
-cardinalPoints = text <$> ["north","south","east","west","nth","sth","e","w","n","s"]
+data Pobox = Gpo Box | Po Box
+  deriving (Show, Eq, Ord)
 
-states :: CharParsing m => [m Text]
-states = text <$> ["nsw","tas","nt","wa","qld","sa","vic"
-                  ,"new south wales","tasmania","northern territory"
-                  ,"western australia","south australia","victoria"]
-
-streetTypes :: CharParsing m => [m Text]
-streetTypes = text <$> ["street","drive","avenue","road","lane","highway","parade"]
-
-aPoint :: Parser Text
-aPoint = choice cardinalPoints
-
-aState :: Parser Text
-aState = choice states
-
-aStreetType :: Parser Text
-aStreetType = choice streetTypes
-
-exampleStatePostcode :: ByteString
-exampleStatePostcode = "vic 3010"
-
-postcodeEOF :: Parser String
-postcodeEOF = do
-  p <- count 4 digit
-  _ <- eof
-  return p
-
-postcodeS :: Parser String
-postcodeS = do
-  p <- count 4 digit
-  _ <- lookAhead $ noneOf "0123456789"
-  return p
-
-postcode :: Parser String
-postcode = postcodeEOF <|> postcodeS
-
-exampleSuburb :: ByteString
-exampleSuburb = "narre warren east"
-
--- T.words (decodeLatin1 exampleSuburb)
-
-foundPoint :: Parser Text
-foundPoint = do
-  p <- aPoint
-  _ <- eof
-  return p
-
-the :: Parser Text
-the = text "the"
-
-streetNumber :: Parser Text
-streetNumber = many digit >>= \digits ->
-  if length digits > 4
-  then fail "Too many digits lol"
-  else pure (T.pack digits)
-
--- tests
+poBox :: Parser Pobox
+poBox = do
+  g <- try $ text "g" <|> text ""
+  _ <- spaceOrStop
+  p <- char 'p'
+  _ <- spaceOrStop
+  o <- char 'o'
+  _ <- spaceOrStop
+  box <- text "box"
+  _ <- spaceOrStop
+  n <- postcode
+  -- _ <- try $ lookAhead $ noneOf "k " <|> char 'k' >> oneOf " ," <|> text ""
+  case g of
+    "g" -> return $ Gpo $ T.pack n
+    _ -> return $ Po $ T.pack n
 
 main :: IO ()
 main = hspec $ do
-  describe "street number" $ do
-    it "parses 4 digits" $ do
-      let (Success n) = parseByteString streetNumber mempty "1234B"
-      n `shouldBe` "1234"
-    it "fails on 5 digits" $ do
-      let (Failure (ErrInfo errDoc m)) =
-            parseByteString streetNumber mempty "12345"
-      show m `shouldBe` "[Columns 5 5]"
-
-
+  describe "Post Office boxes" $ do
+    it "PO box" $ do
+      let (Success n) = parseByteString poBox mempty "po box 1234"
+      n `shouldBe` Po "1234"
+    it "GPO box" $ do
+      let (Success n) = parseByteString poBox mempty "gpo box 1234"
+      n `shouldBe` Gpo "1234"
+    
