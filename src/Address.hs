@@ -50,7 +50,7 @@ data StreetAddress = StAddr
   , getStreetType :: StreetType
   } deriving (Show, Eq, Ord)
 
-data AddressLocation = ALoc Pobox | Aloc StreetAddress
+data AddressLocation = APobox Pobox | AStreetAddress StreetAddress
   deriving (Show, Eq, Ord)
 
 data Address = Address
@@ -61,7 +61,9 @@ data Address = Address
   } deriving (Show, Eq, Ord)
 
 addressLocation :: Parser AddressLocation
-addressLocation = poBox >>= return . ALoc -- will add StreetAddress later with <|>
+addressLocation =
+  (poBox >>= return . APobox)
+  <|> (streetAddress >>= return . AStreetAddress)
 
 poBox :: Parser Pobox
 poBox = do
@@ -87,10 +89,10 @@ streetAddress :: Parser StreetAddress
 streetAddress = do
   n <- streetNumber -- simple case; we'll improve later with ranges, suffixes, etc.
   _ <- spaceOrComma
-  sn <- takeUntil (spaceOrComma >> aStreetType)
+  sn <- takeUntil (spaceOrComma >> aStreetType) -- street name
   _ <- spaceOrComma
   t <- aStreetType
-  -- c <- takeUntil (try $ text "," <|> try aState <|> postcode)
+  -- c <- takeUntil (try $ text "," <|> try aState <|> postcode) -- to use with 'the'
   return $ StAddr n sn t
 
 main :: IO ()
@@ -109,4 +111,11 @@ main = hspec $ do
     it "Simple case" $ do
       let (Success n) = parseByteString streetAddress mempty "12 fair view road"
       n `shouldBe` (StAddr "12" "fair view" "road")
+  describe "Choose best fit" $ do
+    it "chooses street addresses" $ do
+      let (Success n) = parseByteString addressLocation mempty "12 fair view road"
+      n `shouldBe` (AStreetAddress $ StAddr "12" "fair view" "road")
+    it "chooses po boxes" $ do
+      let (Success n) = parseByteString addressLocation mempty "gpo box 1234 k"
+      n `shouldBe` (APobox $ Gpo "1234")
     
