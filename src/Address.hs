@@ -83,6 +83,16 @@ poBox = do
 k :: Parser Text
 k = try $ text "k " <|> text "k,"
 
+streetAddress :: Parser StreetAddress
+streetAddress = do
+  n <- streetNumber -- simple case; we'll improve later with ranges, suffixes, etc.
+  _ <- spaceOrComma
+  sn <- takeUntil (spaceOrComma >> aStreetType)
+  _ <- spaceOrComma
+  t <- aStreetType
+  -- c <- takeUntil (try $ text "," <|> try aState <|> postcode)
+  return $ StAddr n sn t
+
 main :: IO ()
 main = hspec $ do
   describe "Post Office boxes" $ do
@@ -95,4 +105,8 @@ main = hspec $ do
     it "skips the trailing 'k'" $ do
       let (Success n) = parseByteString poBox mempty "gpo box 1234 k,"
       n `shouldBe` Gpo "1234"
+  describe "Street addresses" $ do
+    it "Simple case" $ do
+      let (Success n) = parseByteString streetAddress mempty "12 fair view road"
+      n `shouldBe` (StAddr "12" "fair view" "road")
     

@@ -17,6 +17,9 @@ import           Text.Trifecta
 spaceOrStop :: Parser String
 spaceOrStop = many $ oneOf " ."
 
+spaceOrComma :: Parser String
+spaceOrComma = many $ oneOf " ,"
+
 skipUntil :: Parser Text -> Parser Text
 skipUntil p = try p <|> T.singleton <$> anyChar >> skipUntil p
 
@@ -25,7 +28,7 @@ takeUntil p' =
   go p' T.empty
   where
     go p xs =
-      try (lookAhead p) >> return xs <|>
+      (try (lookAhead p) >> return xs) <|>
       (anyChar >>= \c -> go p (T.snoc xs c))
 
 cardinalPoints :: CharParsing m => [m Text]
@@ -82,6 +85,10 @@ streetNumber = many digit >>= \digits ->
 
 main :: IO ()
 main = hspec $ do
+  describe "takeUntil" $ do
+    it "accumulates all characters until the argument parser succeeds" $ do
+      let (Success x) = parseByteString (takeUntil $ text "road") mempty "12 fair view road"
+      x `shouldBe` "12 fair view "
   describe "street number" $ do
     it "parses 4 digits" $ do
       let (Success n) = parseByteString streetNumber mempty "1234B"
