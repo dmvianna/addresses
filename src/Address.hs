@@ -44,6 +44,25 @@ type State = Text
 data Pobox = Gpo Box | Po Box
   deriving (Show, Eq, Ord)
 
+data StreetAddress = StAddr
+  { getStreetNumber :: StreetNumber
+  , getStreetName :: StreetName
+  , getStreetType :: StreetType
+  } deriving (Show, Eq, Ord)
+
+data AddressLocation = ALoc Pobox | Aloc StreetAddress
+  deriving (Show, Eq, Ord)
+
+data Address = Address
+  { getAddressLocation :: AddressLocation
+  , getCity :: City
+  , getState :: State
+  , getPostcode :: Postcode
+  } deriving (Show, Eq, Ord)
+
+addressLocation :: Parser AddressLocation
+addressLocation = poBox >>= return . ALoc -- will add StreetAddress later with <|>
+
 poBox :: Parser Pobox
 poBox = do
   g <- try $ text "g" <|> text ""
