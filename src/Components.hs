@@ -63,8 +63,8 @@ postcodeS = do
   _ <- lookAhead $ noneOf "0123456789"
   return p
 
-postcode :: Parser String
-postcode = try postcodeEOF <|> postcodeS
+postcode :: Parser Text
+postcode = T.pack <$> (try postcodeEOF <|> postcodeS)
 
 foundPoint :: Parser Text
 foundPoint = do

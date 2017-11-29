@@ -79,8 +79,8 @@ poBox = do
   _ <- spaceOrStop
   _ <- skipOptional k
   case g of
-    "g" -> return $ Gpo $ T.pack n
-    _ -> return $ Po $ T.pack n
+    "g" -> return $ Gpo n
+    _ -> return $ Po n
 
 k :: Parser Text
 k = try $ text "k " <|> text "k,"
@@ -89,11 +89,17 @@ streetAddress :: Parser StreetAddress
 streetAddress = do
   n <- streetNumber -- simple case; we'll improve later with ranges, suffixes, etc.
   _ <- spaceOrComma
-  sn <- takeUntil (spaceOrComma >> aStreetType) -- street name
-  _ <- spaceOrComma
-  t <- aStreetType
-  -- c <- takeUntil (try $ text "," <|> try aState <|> postcode) -- to use with 'the'
-  return $ StAddr n sn t
+  th <- optional the
+  case th of
+    Just t -> do
+      _ <- spaces
+      sn <- takeUntil (try $ text "," <|> try aState <|> postcode)
+      return $ StAddr n sn t
+    Nothing -> do
+      sn <- takeUntil (spaceOrComma >> aStreetType) -- street name
+      _ <- spaceOrComma
+      t <- aStreetType
+      return $ StAddr n sn t
 
 main :: IO ()
 main = hspec $ do
@@ -111,6 +117,9 @@ main = hspec $ do
     it "Simple case" $ do
       let (Success n) = parseByteString streetAddress mempty "12 fair view road"
       n `shouldBe` (StAddr "12" "fair view" "road")
+    it "'the' street type" $ do
+      let (Success n) = parseByteString streetAddress mempty "12 the promenade, nsw"
+      n `shouldBe` (StAddr "12" "promenade" "the")
   describe "Choose best fit" $ do
     it "chooses street addresses" $ do
       let (Success n) = parseByteString addressLocation mempty "12 fair view road"
