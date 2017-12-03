@@ -62,7 +62,7 @@ data Address = Address
 
 addressLocation :: Parser AddressLocation
 addressLocation =
-  (poBox >>= return . APobox)
+  try (poBox >>= return . APobox)
   <|> (streetAddress >>= return . AStreetAddress)
 
 poBox :: Parser Pobox
@@ -101,30 +101,3 @@ streetAddress = do
       t <- aStreetType
       return $ StAddr n sn t
 
-main :: IO ()
-main = hspec $ do
-  describe "Post Office boxes" $ do
-    it "PO box" $ do
-      let (Success n) = parseByteString poBox mempty "po box 1234"
-      n `shouldBe` Po "1234"
-    it "GPO box" $ do
-      let (Success n) = parseByteString poBox mempty "gpo box 1234"
-      n `shouldBe` Gpo "1234"
-    it "skips the trailing 'k'" $ do
-      let (Success n) = parseByteString poBox mempty "gpo box 1234 k,"
-      n `shouldBe` Gpo "1234"
-  describe "Street addresses" $ do
-    it "Simple case" $ do
-      let (Success n) = parseByteString streetAddress mempty "12 fair view road"
-      n `shouldBe` (StAddr "12" "fair view" "road")
-    it "'the' street type" $ do
-      let (Success n) = parseByteString streetAddress mempty "12 the promenade, nsw"
-      n `shouldBe` (StAddr "12" "promenade" "the")
-  describe "Choose best fit" $ do
-    it "chooses street addresses" $ do
-      let (Success n) = parseByteString addressLocation mempty "12 fair view road"
-      n `shouldBe` (AStreetAddress $ StAddr "12" "fair view" "road")
-    it "chooses po boxes" $ do
-      let (Success n) = parseByteString addressLocation mempty "gpo box 1234 k"
-      n `shouldBe` (APobox $ Gpo "1234")
-    

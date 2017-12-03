@@ -81,19 +81,3 @@ streetNumber = many digit >>= \digits ->
   then fail "Too many digits lol"
   else pure (T.pack digits)
 
--- tests
-
-main :: IO ()
-main = hspec $ do
-  describe "takeUntil" $ do
-    it "accumulates all characters until the argument parser succeeds" $ do
-      let (Success x) = parseByteString (takeUntil $ text "road") mempty "12 fair view road"
-      x `shouldBe` "12 fair view "
-  describe "street number" $ do
-    it "parses 4 digits" $ do
-      let (Success n) = parseByteString streetNumber mempty "1234B"
-      n `shouldBe` "1234"
-    it "fails on 5 digits" $ do
-      let (Failure (ErrInfo errDoc m)) =
-            parseByteString streetNumber mempty "12345"
-      show m `shouldBe` "[Columns 5 5]"
