@@ -20,7 +20,7 @@ addEx = [r|abstract (11 document no. au-a-10803/92 (19) australian patent office
 
 main :: IO ()
 main = hspec $ do
-  describe "takeUntil" $ do
+  describe "takeUntil" $
     it "accumulates all characters until the argument parser succeeds" $ do
       let actual = parseByteString (takeUntil $ text "road")
             mempty "12 fair view road"

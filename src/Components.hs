@@ -81,7 +81,16 @@ streetNumber = some digit >>= \digits ->
   then fail "Too many digits lol"
   else pure (T.pack digits)
 
--- manyTillN :: Parsing m => Int -> m Char -> m end -> m String
--- manyTillN n p end = go n
---   where go i | i > 0 = ([] <$ end) <|> ((:) <$> p <*> go (i - 1))
---              | otherwise = unexpected $ "more than " ++ show n ++ " chars"
+skipUntilN :: Int -> Parser Text -> Parser Text
+skipUntilN n p = go n
+  where go i | i > 0 = try p <|> T.singleton <$> anyChar >> skipUntilN (i - 1) p
+             | otherwise = unexpected $ "more than " ++ show n ++ " chars"
+
+takeUntilN :: Int -> Parser Text -> Parser Text
+takeUntilN n' p' =
+  go n' p' T.empty
+  where
+    go n p xs | n > 0 =
+                (try (lookAhead p) >> return xs) <|>
+                (anyChar >>= \c -> go (n - 1) p (T.snoc xs c))
+              | otherwise = unexpected $ "more than " ++ show n' ++ " chars"

@@ -98,11 +98,10 @@ streetAddress = do
   case th of
     Just t -> do
       _ <- spaces
-      sn <- takeUntil (try $ text "," <|> try aState <|> postcode)
+      sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
       return $ StAddr n sn t
     Nothing -> do
-      sn <- takeUntil (spaces >> aStreetType) -- street name
-      -- sn <- takeUntil (T.pack <$> manyTillN 40 anyChar aStreetType)
+      sn <- takeUntilN 32 (spaceOrComma >> aStreetType) -- street name
       _ <- spaceOrComma
       t <- aStreetType
       return $ StAddr n sn t
