@@ -20,22 +20,32 @@ addEx = [r|abstract (11 document no. au-a-10803/92 (19) australian patent office
 
 main :: IO ()
 main = hspec $ do
-  describe "takeUntil" $
-    it "accumulates all characters until the argument parser succeeds" $ do
+
+  describe "takeUntil and takeUntilN" $ do
+    it "takeUntil accumulates all characters until the argument parser succeeds" $ do
       let actual = parseByteString (takeUntil $ text "road")
             mempty "12 fair view road"
           expected = "12 fair view "
       actual `shouldBe` Success expected
+    it "takeUntilN accumulates all characters until the argument parser succeeds" $ do
+      let actual = parseByteString (takeUntilN 32 $ text "road")
+            mempty "12 fair view road"
+          expected = "12 fair view "
+      actual `shouldBe` Success expected
+    it "takeUntilN chokes if the parser doesn't succeed immediately after the maximum range of characters" $ do
+      case parseByteString (takeUntilN 3 $ text "road") mempty "12 fair view road" of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        _ -> fail "this test should fail"
+
   describe "street number" $ do
     it "parses 4 digits" $ do
       let actual = parseByteString streetNumber mempty "1234B"
           expected = "1234"
       actual `shouldBe` Success expected
     it "fails on 5 digits" $ do
-      let (Failure (ErrInfo _ actual)) =
-            parseByteString streetNumber mempty "12345"
-          expected = "[Columns 5 5]"
-      show actual `shouldBe` expected
+      case parseByteString streetNumber mempty "12345" of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 5 5]"
+        _ -> fail "this test should fail"
 
   describe "Post Office boxes" $ do
     it "PO box" $ do
@@ -50,6 +60,7 @@ main = hspec $ do
       let actual = parseByteString poBox mempty "gpo box 1234 k,"
           expected = Gpo "1234"
       actual `shouldBe` Success expected
+
   describe "Street addresses" $ do
     it "Simple case" $ do
       let actual = parseByteString streetAddress mempty "12 fair view road"
@@ -59,6 +70,7 @@ main = hspec $ do
       let actual = parseByteString streetAddress mempty "12 the promenade, nsw"
           expected = StAddr "12" "promenade" "the"
       actual `shouldBe` Success expected
+
   describe "Choose best fit" $ do
     it "chooses street addresses" $ do
       let actual = parseByteString addressLocation mempty "12 fair view road"
@@ -71,7 +83,7 @@ main = hspec $ do
 
   describe "large example" $ do
     it "finds PO Box within text" $ do
-      let actual = parseByteString step mempty "at gpo box 3898 k sydney nsw and"
+      let actual = parseByteString step mempty addEx --"at gpo box 3898 k sydney nsw and"
           expected = APobox $ Gpo "3898"
       actual `shouldBe` Success expected
     it "finds street address within text" $ do
