@@ -10,12 +10,12 @@ import           Data.Char
 import           Data.Text             (Text)
 import qualified Data.Text             as T
 import           Data.Text.Encoding
+import           Test.Hspec
 import           Text.Parser.LookAhead
 import           Text.RawString.QQ
 import           Text.Trifecta
-import           Test.Hspec
 
-import Components hiding (main)
+import           Components            hiding (main)
 
 {-|
 Addresses are not standardised. Here is a non comprehensive list
@@ -46,8 +46,8 @@ data Pobox = Gpo Box | Po Box
 
 data StreetAddress = StAddr
   { getStreetNumber :: StreetNumber
-  , getStreetName :: StreetName
-  , getStreetType :: StreetType
+  , getStreetName   :: StreetName
+  , getStreetType   :: StreetType
   } deriving (Show, Eq, Ord)
 
 data AddressLocation = APobox Pobox | AStreetAddress StreetAddress
@@ -55,15 +55,20 @@ data AddressLocation = APobox Pobox | AStreetAddress StreetAddress
 
 data Address = Address
   { getAddressLocation :: AddressLocation
-  , getCity :: City
-  , getState :: State
-  , getPostcode :: Postcode
+  , getCity            :: City
+  , getState           :: State
+  , getPostcode        :: Postcode
   } deriving (Show, Eq, Ord)
 
 addressLocation :: Parser AddressLocation
 addressLocation =
   try (poBox >>= return . APobox)
   <|> (streetAddress >>= return . AStreetAddress)
+
+step :: Parser AddressLocation
+step = do
+  _ <- anyChar
+  try addressLocation <|> step
 
 poBox :: Parser Pobox
 poBox = do
@@ -80,7 +85,7 @@ poBox = do
   _ <- skipOptional k
   case g of
     "g" -> return $ Gpo n
-    _ -> return $ Po n
+    _   -> return $ Po n
 
 k :: Parser Text
 k = try $ text "k " <|> text "k,"
