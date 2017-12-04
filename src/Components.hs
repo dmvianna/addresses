@@ -76,12 +76,12 @@ the :: Parser Text
 the = text "the"
 
 streetNumber :: Parser Text
-streetNumber = many digit >>= \digits ->
+streetNumber = some digit >>= \digits ->
   if length digits > 4
   then fail "Too many digits lol"
   else pure (T.pack digits)
 
-manyTillN :: Parsing m => Int -> m Char -> m end -> m String
-manyTillN n p end = go n
-  where go i | i > 0 = ([] <$ end) <|> ((:) <$> p <*> go (i - 1))
-             | otherwise = unexpected $ "more than " ++ show n ++ " chars"
+-- manyTillN :: Parsing m => Int -> m Char -> m end -> m String
+-- manyTillN n p end = go n
+--   where go i | i > 0 = ([] <$ end) <|> ((:) <$> p <*> go (i - 1))
+--              | otherwise = unexpected $ "more than " ++ show n ++ " chars"
