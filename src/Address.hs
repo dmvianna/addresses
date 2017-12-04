@@ -101,7 +101,8 @@ streetAddress = do
       sn <- takeUntil (try $ text "," <|> try aState <|> postcode)
       return $ StAddr n sn t
     Nothing -> do
-      sn <- takeUntil (spaceOrComma >> aStreetType) -- street name
+      sn <- takeUntil (spaces >> aStreetType) -- street name
+      -- sn <- takeUntil (T.pack <$> manyTillN 40 anyChar aStreetType)
       _ <- spaceOrComma
       t <- aStreetType
       return $ StAddr n sn t
