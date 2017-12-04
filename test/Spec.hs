@@ -71,6 +71,11 @@ main = hspec $ do
 
   describe "large example" $ do
     it "finds PO Box within text" $ do
-      let actual = parseByteString step mempty addEx
-          expected = APobox $ Gpo "3898" --, sydney nsw 2001
+      let actual = parseByteString step mempty "at gpo box 3898 k sydney nsw and"
+          expected = APobox $ Gpo "3898"
       actual `shouldBe` Success expected
+    it "finds street address within text" $ do
+      let actual = parseByteString step mempty "at 34 amazing street newfoundland"
+          expected = AStreetAddress $ StAddr {getStreetNumber = "34", getStreetName = "amazing", getStreetType = "street"}
+      actual `shouldBe` Success expected
+
