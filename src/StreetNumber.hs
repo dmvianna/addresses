@@ -19,13 +19,10 @@ newtype Suffix = Suffix Text
 newtype Prefix = Prefix Text
 newtype Number = Number Text
 
-data Single = Single Prefix Suffix Number
+data Single = Single Prefix Number Suffix
 
 data StreetNumber = One Single
                   | Range Single Single
-
-streetNumber :: Parser Text
-streetNumber = undefined
 
 singleNumber :: Parser Text
 singleNumber = some digit >>= \digits ->
@@ -34,8 +31,33 @@ singleNumber = some digit >>= \digits ->
   else pure (T.pack digits)
 
 singleFix :: Parser Text
-singleFix = some letter >>= \letters ->
+singleFix = many letter >>= \letters ->
   if length letters > 2
   then fail $ "Too many letters: " <> letters
   else pure (T.pack letters)
+
+single :: Parser Single
+single = do
+  p <- singleFix
+  n <- singleNumber
+  s <- singleFix
+  pure $ Single (Prefix p) (Number n) (Suffix s)
+
+oneNumber :: Parser StreetNumber
+oneNumber = do
+  n <- single <* notFollowedBy (spaces >> char '-' >> spaces)
+  pure $ One n
+
+rangeNumber :: Parser StreetNumber
+rangeNumber = do
+  startN <- single
+  _ <- spaces
+  _ <- char '-'
+  _ <- spaces
+  endN <- single
+  _ <- lookAhead spaceOrComma
+  pure $ Range startN endN
+
+streetNumber :: Parser StreetNumber
+streetNumber = try rangeNumber <|> oneNumber
 
