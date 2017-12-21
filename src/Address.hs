@@ -1,7 +1,4 @@
 
-{-# LANGUAGE OverloadedLists   #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Address where
 
 import           Control.Applicative

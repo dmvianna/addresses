@@ -12,6 +12,7 @@ category:            Web
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+default-extensions:  OverloadedStrings
 
 library
   hs-source-dirs:      src
@@ -37,4 +38,4 @@ test-suite address-test
   
 source-repository head
   type:     git
-  location: https://github.com/dmvianna/addresses
+  location: https://github.com/dmvianna/addresses.git
