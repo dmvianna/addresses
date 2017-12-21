@@ -30,13 +30,13 @@ or `"12 Elizabeth Street VIC 3144"`.
 
 type Box = Text
 
-type StreetNumber = Text
-type StreetName = Text
-type StreetType = Text
+newtype StreetNumber = StreetNumber Text deriving (Show, Eq, Ord)
+newtype StreetName = StreetName Text deriving (Show, Eq, Ord)
+newtype StreetType = StreetType Text deriving (Show, Eq, Ord)
 
-type City = Text
-type Postcode = Text
-type State = Text
+newtype City = City Text deriving (Show, Eq, Ord)
+newtype Postcode = Postcode Text deriving (Show, Eq, Ord)
+newtype State = State Text deriving (Show, Eq, Ord)
 
 data Pobox = Gpo Box | Po Box
   deriving (Show, Eq, Ord)
@@ -96,10 +96,10 @@ streetAddress = do
     Just t -> do
       _ <- spaces
       sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
-      return $ StAddr n sn t
+      return $ StAddr (StreetNumber n) (StreetName sn) (StreetType t)
     Nothing -> do
       sn <- takeUntilN 32 (spaceOrComma >> aStreetType) -- street name
       _ <- spaceOrComma
       t <- aStreetType
-      return $ StAddr n sn t
+      return $ StAddr (StreetNumber n) (StreetName sn) (StreetType t)
 

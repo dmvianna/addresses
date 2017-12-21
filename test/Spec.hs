@@ -1,5 +1,5 @@
 
-{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 module Main where
 
@@ -35,7 +35,7 @@ main = hspec $ do
     it "takeUntilN chokes if the parser doesn't succeed immediately after the maximum range of characters" $ do
       case parseByteString (takeUntilN 3 $ text "road") mempty "12 fair view road" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
-        _ -> fail "this test should fail"
+        _                          -> fail "this test should fail"
 
   describe "street number" $ do
     it "parses 4 digits" $ do
@@ -45,7 +45,7 @@ main = hspec $ do
     it "fails on 5 digits" $ do
       case parseByteString streetNumber mempty "12345" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 5 5]"
-        _ -> fail "this test should fail"
+        _                          -> fail "this test should fail"
 
   describe "Post Office boxes" $ do
     it "PO box" $ do
@@ -64,17 +64,26 @@ main = hspec $ do
   describe "Street addresses" $ do
     it "Simple case" $ do
       let actual = parseByteString streetAddress mempty "12 fair view road"
-          expected = StAddr "12" "fair view" "road"
+          expected = StAddr
+                     (StreetNumber "12")
+                     (StreetName "fair view")
+                     (StreetType "road")
       actual `shouldBe` Success expected
     it "'the' street type" $ do
       let actual = parseByteString streetAddress mempty "12 the promenade, nsw"
-          expected = StAddr "12" "promenade" "the"
+          expected = StAddr
+                     (StreetNumber "12")
+                     (StreetName "promenade")
+                     (StreetType "the")
       actual `shouldBe` Success expected
 
   describe "Choose best fit" $ do
     it "chooses street addresses" $ do
       let actual = parseByteString addressLocation mempty "12 fair view road"
-          expected = AStreetAddress $ StAddr "12" "fair view" "road"
+          expected = AStreetAddress $ StAddr
+                     (StreetNumber "12")
+                     (StreetName "fair view")
+                     (StreetType "road")
       actual `shouldBe` Success expected
     it "chooses po boxes" $ do
       let actual = parseByteString addressLocation mempty "gpo box 1234 k"
@@ -83,11 +92,16 @@ main = hspec $ do
 
   describe "large example" $ do
     it "finds PO Box within text" $ do
-      let actual = parseByteString step mempty addEx --"at gpo box 3898 k sydney nsw and"
+      let actual = parseByteString step mempty addEx
+                   --"at gpo box 3898 k sydney nsw and"
           expected = APobox $ Gpo "3898"
       actual `shouldBe` Success expected
     it "finds street address within text" $ do
       let actual = parseByteString step mempty "at 343 amazing street newfoundland"
-          expected = AStreetAddress $ StAddr {getStreetNumber = "343", getStreetName = "amazing", getStreetType = "street"}
+          expected = AStreetAddress $ StAddr
+                     { getStreetNumber = StreetNumber "343"
+                     , getStreetName = StreetName "amazing"
+                     , getStreetType = StreetType "street"
+                     }
       actual `shouldBe` Success expected
 
