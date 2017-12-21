@@ -15,8 +15,15 @@ import           Text.Trifecta
 spaceOrStop :: Parser String
 spaceOrStop = many $ oneOf " ."
 
+spaceOrStop' :: Parser String
+spaceOrStop' = some $ oneOf " ."
+
 spaceOrComma :: Parser String
 spaceOrComma = many $ oneOf " ,"
+
+spaceOrComma' :: Parser String
+spaceOrComma' = some $ oneOf " ,"
+
 
 skipUntil :: Parser Text -> Parser Text
 skipUntil p = try p <|> T.singleton <$> anyChar >> skipUntil p

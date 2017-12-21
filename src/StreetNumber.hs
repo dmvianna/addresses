@@ -46,7 +46,8 @@ single = do
 
 oneNumber :: Parser StreetNumber
 oneNumber = do
-  n <- single <* notFollowedBy (spaces >> char '-' >> spaces)
+  n <- single
+  _ <- lookAhead spaceOrComma' <* (notFollowedBy $ char '-')
   pure $ One n
 
 rangeNumber :: Parser StreetNumber
@@ -56,7 +57,7 @@ rangeNumber = do
   _ <- char '-'
   _ <- spaces
   endN <- single
-  _ <- lookAhead spaceOrComma
+  _ <- lookAhead spaceOrComma' <* (notFollowedBy $ char '-')
   pure $ Range startN endN
 
 streetNumber :: Parser StreetNumber
@@ -72,6 +73,20 @@ main = hspec $ do
 
   describe "street number" $ do
     it "parses single street number" $ do
-      let actual = parseByteString streetNumber mempty "12B"
+      let actual = parseByteString streetNumber mempty "12B "
           expected = One $ Single (Prefix "") (Number "12") (Suffix "B")
       actual `shouldBe` Success expected
+    it "parses range number" $ do
+      let actual = parseByteString streetNumber mempty "A12B-A24C "
+          expected = Range
+                     (Single (Prefix "A") (Number "12") (Suffix "B"))
+                     (Single (Prefix "A") (Number "24") (Suffix "C"))
+      actual `shouldBe` Success expected
+    it "fails on malformed single street number" $ do
+      case parseByteString streetNumber mempty "12B4 " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        _                          -> fail "this test should fail"
+    it "fails on malformed range street number" $ do
+      case parseByteString streetNumber mempty "12B-C " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        _                          -> fail "this test should fail"
