@@ -10,6 +10,7 @@ import           Text.Trifecta
 
 import           Address           hiding (main)
 import           Components        hiding (main)
+import           StreetNumber      hiding (main, streetNumber)
 
 instance Eq a => Eq (Result a) where
   Success x == Success y = x == y

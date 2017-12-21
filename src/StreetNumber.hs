@@ -13,16 +13,17 @@ import           Text.Parser.LookAhead
 import           Text.RawString.QQ
 import           Text.Trifecta
 
-import           Components
+import           Components            hiding (streetNumber)
 
-newtype Suffix = Suffix Text
-newtype Prefix = Prefix Text
-newtype Number = Number Text
+newtype Suffix = Suffix Text deriving (Show, Eq, Ord)
+newtype Prefix = Prefix Text deriving (Show, Eq, Ord)
+newtype Number = Number Text deriving (Show, Eq, Ord)
 
-data Single = Single Prefix Number Suffix
+data Single = Single Prefix Number Suffix deriving (Show, Eq, Ord)
 
 data StreetNumber = One Single
                   | Range Single Single
+                  deriving (Show, Eq, Ord)
 
 singleNumber :: Parser Text
 singleNumber = some digit >>= \digits ->
@@ -61,3 +62,16 @@ rangeNumber = do
 streetNumber :: Parser StreetNumber
 streetNumber = try rangeNumber <|> oneNumber
 
+instance Eq a => Eq (Result a) where
+  Success x == Success y = x == y
+  _ == _ = False
+
+
+main :: IO ()
+main = hspec $ do
+
+  describe "street number" $ do
+    it "parses single street number" $ do
+      let actual = parseByteString streetNumber mempty "12B"
+          expected = One $ Single (Prefix "") (Number "12") (Suffix "B")
+      actual `shouldBe` Success expected
