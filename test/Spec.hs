@@ -98,10 +98,12 @@ main = hspec $ do
           expected = APobox $ Gpo "3898"
       actual `shouldBe` Success expected
     it "finds street address within text" $ do
-      let actual = parseByteString step mempty "at 343 amazing street newfoundland"
+      let actual = parseByteString step mempty "at 343-400 amazing street newfoundland"
           expected = AStreetAddress $ StAddr
                      { getStreetNumber =
-                         One $ Single (Prefix "") (Number "343") (Suffix "")
+                         Range
+                         (Single (Prefix "") (Number "343") (Suffix ""))
+                         (Single (Prefix "") (Number "400") (Suffix ""))
                      , getStreetName = StreetName "amazing"
                      , getStreetType = StreetType "street"
                      }
