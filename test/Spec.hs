@@ -10,7 +10,7 @@ import           Text.Trifecta
 
 import           Address           hiding (main)
 import           Components        hiding (main)
-import           StreetNumber      hiding (main, streetNumber)
+import           StreetNumber      hiding (main)
 
 instance Eq a => Eq (Result a) where
   Success x == Success y = x == y
@@ -40,8 +40,8 @@ main = hspec $ do
 
   describe "street number" $ do
     it "parses 4 digits" $ do
-      let actual = parseByteString streetNumber mempty "1234B"
-          expected = "1234"
+      let actual = parseByteString streetNumber mempty "1234B "
+          expected = One $ Single (Prefix "") (Number "1234") (Suffix "B")
       actual `shouldBe` Success expected
     it "fails on 5 digits" $ do
       case parseByteString streetNumber mempty "12345" of
@@ -66,14 +66,14 @@ main = hspec $ do
     it "Simple case" $ do
       let actual = parseByteString streetAddress mempty "12 fair view road"
           expected = StAddr
-                     (StreetNumber "12")
+                     (One $ Single (Prefix "") (Number "12") (Suffix ""))
                      (StreetName "fair view")
                      (StreetType "road")
       actual `shouldBe` Success expected
     it "'the' street type" $ do
       let actual = parseByteString streetAddress mempty "12 the promenade, nsw"
           expected = StAddr
-                     (StreetNumber "12")
+                     (One $ Single (Prefix "") (Number "12") (Suffix ""))
                      (StreetName "promenade")
                      (StreetType "the")
       actual `shouldBe` Success expected
@@ -82,7 +82,7 @@ main = hspec $ do
     it "chooses street addresses" $ do
       let actual = parseByteString addressLocation mempty "12 fair view road"
           expected = AStreetAddress $ StAddr
-                     (StreetNumber "12")
+                     (One $ Single (Prefix "") (Number "12") (Suffix ""))
                      (StreetName "fair view")
                      (StreetType "road")
       actual `shouldBe` Success expected
@@ -100,9 +100,29 @@ main = hspec $ do
     it "finds street address within text" $ do
       let actual = parseByteString step mempty "at 343 amazing street newfoundland"
           expected = AStreetAddress $ StAddr
-                     { getStreetNumber = StreetNumber "343"
+                     { getStreetNumber =
+                         One $ Single (Prefix "") (Number "343") (Suffix "")
                      , getStreetName = StreetName "amazing"
                      , getStreetType = StreetType "street"
                      }
       actual `shouldBe` Success expected
 
+  describe "street number" $ do
+    it "parses single street number" $ do
+      let actual = parseByteString streetNumber mempty "12B "
+          expected = One $ Single (Prefix "") (Number "12") (Suffix "B")
+      actual `shouldBe` Success expected
+    it "parses range number" $ do
+      let actual = parseByteString streetNumber mempty "A12B-A24C "
+          expected = Range
+                     (Single (Prefix "A") (Number "12") (Suffix "B"))
+                     (Single (Prefix "A") (Number "24") (Suffix "C"))
+      actual `shouldBe` Success expected
+    it "fails on malformed single street number" $ do
+      case parseByteString streetNumber mempty "12B4 " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        _                          -> fail "this test should fail"
+    it "fails on malformed range street number" $ do
+      case parseByteString streetNumber mempty "12B-C " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        _                          -> fail "this test should fail"

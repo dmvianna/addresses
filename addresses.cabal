@@ -12,7 +12,7 @@ category:            Web
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
-default-extensions:  OverloadedStrings
+
 
 library
   hs-source-dirs:      src
@@ -24,8 +24,12 @@ library
                      , raw-strings-qq
                      , text
                      , trifecta
+  -- exposed-modules:     Address
+  --                    , Components
+  --                    , StreetNumber
   default-language:    Haskell2010
-
+  default-extensions:  OverloadedStrings
+                     
 test-suite address-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
@@ -34,7 +38,14 @@ test-suite address-test
                      , base
                      , bytestring
                      , hspec
+                     , trifecta
+                     , text
+                     , parsers
+                     , raw-strings-qq
+  hs-source-dirs:      src
+                     , test
   default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
   
 source-repository head
   type:     git

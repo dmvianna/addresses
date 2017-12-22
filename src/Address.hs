@@ -12,7 +12,8 @@ import           Text.Parser.LookAhead
 import           Text.RawString.QQ
 import           Text.Trifecta
 
-import           Components            hiding (main)
+import           Components
+import           StreetNumber
 
 {-|
 Addresses are not standardised. Here is a non comprehensive list
@@ -30,7 +31,6 @@ or `"12 Elizabeth Street VIC 3144"`.
 
 type Box = Text
 
-newtype StreetNumber = StreetNumber Text deriving (Show, Eq, Ord)
 newtype StreetName = StreetName Text deriving (Show, Eq, Ord)
 newtype StreetType = StreetType Text deriving (Show, Eq, Ord)
 
@@ -96,10 +96,10 @@ streetAddress = do
     Just t -> do
       _ <- spaces
       sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
-      return $ StAddr (StreetNumber n) (StreetName sn) (StreetType t)
+      return $ StAddr n (StreetName sn) (StreetType t)
     Nothing -> do
       sn <- takeUntilN 32 (spaceOrComma >> aStreetType) -- street name
       _ <- spaceOrComma
       t <- aStreetType
-      return $ StAddr (StreetNumber n) (StreetName sn) (StreetType t)
+      return $ StAddr n (StreetName sn) (StreetType t)
 

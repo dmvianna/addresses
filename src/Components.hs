@@ -80,12 +80,6 @@ foundPoint = do
 the :: Parser Text
 the = text "the"
 
-streetNumber :: Parser Text
-streetNumber = some digit >>= \digits ->
-  if length digits > 4
-  then fail "Too many digits lol"
-  else pure (T.pack digits)
-
 skipUntilN :: Int -> Parser Text -> Parser Text
 skipUntilN n p = go n
   where go i | i > 0 = try p <|> T.singleton <$> anyChar >> skipUntilN (i - 1) p
