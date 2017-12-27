@@ -1,0 +1,33 @@
+name: addresses
+version: '0.1.0.0'
+synopsis: parsers for commonly used Australian street address types
+category: Web
+author: Daniel Vianna
+maintainer: dmlvianna <at> gmail <dot> com
+copyright: 2017 Daniel Vianna
+license: BSD3
+github: dmvianna/addresses.git
+extra-source-files:
+- README.md
+default-extensions:
+- OverloadedStrings
+dependencies:
+- base
+- bytestring
+- hspec
+- parsers
+- raw-strings-qq
+- text
+- trifecta
+library:
+  source-dirs: src
+  exposed-modules:
+  - Lib
+tests:
+  address-test:
+    main: Spec.hs
+    source-dirs:
+    - test
+    - src
+    dependencies:
+    - addresses

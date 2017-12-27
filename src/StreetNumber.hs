@@ -62,31 +62,3 @@ rangeNumber = do
 
 streetNumber :: Parser StreetNumber
 streetNumber = try rangeNumber <|> oneNumber
-
--- instance Eq a => Eq (Result a) where
---   Success x == Success y = x == y
---   _ == _ = False
-
-
--- main :: IO ()
--- main = hspec $ do
-
---   describe "street number" $ do
---     it "parses single street number" $ do
---       let actual = parseByteString streetNumber mempty "12B "
---           expected = One $ Single (Prefix "") (Number "12") (Suffix "B")
---       actual `shouldBe` Success expected
---     it "parses range number" $ do
---       let actual = parseByteString streetNumber mempty "A12B-A24C "
---           expected = Range
---                      (Single (Prefix "A") (Number "12") (Suffix "B"))
---                      (Single (Prefix "A") (Number "24") (Suffix "C"))
---       actual `shouldBe` Success expected
---     it "fails on malformed single street number" $ do
---       case parseByteString streetNumber mempty "12B4 " of
---         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
---         _                          -> fail "this test should fail"
---     it "fails on malformed range street number" $ do
---       case parseByteString streetNumber mempty "12B-C " of
---         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
---         _                          -> fail "this test should fail"
