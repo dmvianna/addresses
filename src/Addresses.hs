@@ -1,4 +1,4 @@
-module Lib
+module Addresses
     ( spaceOrStop
     , spaceOrStop'
     , spaceOrComma

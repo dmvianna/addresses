@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: deaf4578b59b346465a2bf93965fc04a0f299795211b11a0e61d3fd68bda0d86
+-- hash: 941f47b56340fdd2cc20493c31a13b80c74c3fd81ae6504e25a61faada85ad62
 
 name:           addresses
 version:        0.1.0.0
@@ -38,7 +38,7 @@ library
     , text
     , trifecta
   exposed-modules:
-      Lib
+      Addresses
   other-modules:
       Address
       Components
@@ -64,8 +64,8 @@ test-suite address-test
     , trifecta
   other-modules:
       Address
+      Addresses
       Components
-      Lib
       StreetNumber
       Paths_addresses
   default-language: Haskell2010

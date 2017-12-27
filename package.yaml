@@ -22,7 +22,7 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules:
-  - Lib
+  - Addresses
 tests:
   address-test:
     main: Spec.hs
