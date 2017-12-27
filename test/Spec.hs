@@ -108,6 +108,10 @@ main = hspec $ do
                      , getStreetType = StreetType "street"
                      }
       actual `shouldBe` Success expected
+    it "fails on empty street name" $ do
+      case parseByteString step mempty "R6 and R7 the same or different" of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
+        _                          -> fail "this test should fail"
 
   describe "street number" $ do
     it "parses single street number" $ do

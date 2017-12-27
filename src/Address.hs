@@ -96,10 +96,14 @@ streetAddress = do
     Just t -> do
       _ <- spaces
       sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
-      return $ StAddr n (StreetName sn) (StreetType t)
+      street n sn t
     Nothing -> do
       sn <- takeUntilN 32 (spaceOrComma >> aStreetType) -- street name
       _ <- spaceOrComma
       t <- aStreetType
-      return $ StAddr n (StreetName sn) (StreetType t)
-
+      street n sn t
+  where
+    street n' sn' t' =
+      if T.length sn' > 0
+      then pure $ StAddr n' (StreetName sn') (StreetType t')
+      else unexpected "street with no name"
