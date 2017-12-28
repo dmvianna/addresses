@@ -36,7 +36,7 @@ main = hspec $ do
     it "takeUntilN chokes if the parser doesn't succeed immediately after the maximum range of characters" $ do
       case parseByteString (takeUntilN 3 $ text "road") mempty "12 fair view road" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
 
   describe "street number" $ do
     it "parses 4 digits" $ do
@@ -46,11 +46,11 @@ main = hspec $ do
     it "fails on 5 digits" $ do
       case parseByteString streetNumber mempty "12345" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 5 5]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
     it "fails to parse zero-padded number" $ do
       case parseByteString streetNumber mempty "01 " of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 2 2]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
 
   describe "Post Office boxes" $ do
     it "PO box" $ do
@@ -84,7 +84,7 @@ main = hspec $ do
     it "street type is not followed by non-spaceOrComma" $ do
       case parseByteString streetAddress mempty "12 computer drives " of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 19 19]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
 
   describe "Choose best fit" $ do
     it "chooses street addresses" $ do
@@ -119,7 +119,11 @@ main = hspec $ do
     it "fails on empty street name" $ do
       case parseByteString step mempty "R6 and R7 the same or different" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
+    -- it "fails on street number padded by zero" $ do
+    --   case parseByteString step mempty "formula 1 .00002 the of .00002" of
+    --     Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
+    --     Success actual             -> fail $ "this test should fail: " ++ show actual
 
   describe "street number" $ do
     it "parses single street number" $ do
@@ -135,8 +139,8 @@ main = hspec $ do
     it "fails on malformed single street number" $ do
       case parseByteString streetNumber mempty "12B4 " of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
     it "fails on malformed range street number" $ do
       case parseByteString streetNumber mempty "12B-C " of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
-        _                          -> fail "this test should fail"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
