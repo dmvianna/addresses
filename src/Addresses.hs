@@ -37,8 +37,9 @@ module Addresses
     , City
     , Postcode
     , State
+    , Pobox(..)
     , StreetAddress
-    , AddressLocation
+    , AddressLocation(..)
     , Address
     , addressLocation
     , step
