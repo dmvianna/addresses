@@ -47,6 +47,10 @@ main = hspec $ do
       case parseByteString streetNumber mempty "12345" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 5 5]"
         _                          -> fail "this test should fail"
+    it "fails to parse zero-padded number" $ do
+      case parseByteString streetNumber mempty "01 " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 2 2]"
+        _                          -> fail "this test should fail"
 
   describe "Post Office boxes" $ do
     it "PO box" $ do
@@ -64,7 +68,7 @@ main = hspec $ do
 
   describe "Street addresses" $ do
     it "Simple case" $ do
-      let actual = parseByteString streetAddress mempty "12 fair view road"
+      let actual = parseByteString streetAddress mempty "12 fair view road "
           expected = StAddr
                      (One $ Single (Prefix "") (Number "12") (Suffix ""))
                      (StreetName "fair view")
@@ -77,10 +81,14 @@ main = hspec $ do
                      (StreetName "promenade")
                      (StreetType "the")
       actual `shouldBe` Success expected
+    it "street type is not followed by non-spaceOrComma" $ do
+      case parseByteString streetAddress mempty "12 computer drives " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 19 19]"
+        _                          -> fail "this test should fail"
 
   describe "Choose best fit" $ do
     it "chooses street addresses" $ do
-      let actual = parseByteString addressLocation mempty "12 fair view road"
+      let actual = parseByteString addressLocation mempty "12 fair view road "
           expected = AStreetAddress $ StAddr
                      (One $ Single (Prefix "") (Number "12") (Suffix ""))
                      (StreetName "fair view")

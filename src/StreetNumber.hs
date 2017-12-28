@@ -27,7 +27,7 @@ data StreetNumber = One Single
 
 singleNumber :: Parser Text
 singleNumber = some digit >>= \digits ->
-  if length digits > 5
+  if (head digits == '0') || (length digits > 5)
   then fail $ "Too many digits: " <> digits
   else pure (T.pack digits)
 

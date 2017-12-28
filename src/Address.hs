@@ -98,7 +98,7 @@ streetAddress = do
       sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
       street n sn t
     Nothing -> do
-      sn <- takeUntilN 32 (spaceOrComma >> aStreetType) -- street name
+      sn <- takeUntilN 32 $ T.pack <$> boundedStreetType -- street name
       _ <- spaceOrComma
       t <- aStreetType
       street n sn t
@@ -107,3 +107,5 @@ streetAddress = do
       if T.length sn' > 0
       then pure $ StAddr n' (StreetName sn') (StreetType t')
       else unexpected "street with no name"
+    boundedStreetType =
+      spaceOrComma >> aStreetType >> spaceOrComma'
