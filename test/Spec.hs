@@ -65,6 +65,14 @@ main = hspec $ do
       let actual = parseByteString poBox mempty "gpo box 1234 k,"
           expected = Gpo "1234"
       actual `shouldBe` Success expected
+    it "locked bag" $ do
+      let actual = parseByteString bag mempty "locked bag no. 1234"
+          expected = Locked "1234"
+      actual `shouldBe` Success expected
+    it "GPO box" $ do
+      let actual = parseByteString bag mempty "private bag 1234"
+          expected = Private "1234"
+      actual `shouldBe` Success expected
 
   describe "Street addresses" $ do
     it "Simple case" $ do

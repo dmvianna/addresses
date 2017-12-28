@@ -4,6 +4,7 @@ module Address where
 import           Control.Applicative
 import           Data.ByteString       (ByteString)
 import           Data.Char
+import           Data.Monoid           ((<>))
 import           Data.Text             (Text)
 import qualified Data.Text             as T
 import           Data.Text.Encoding
@@ -29,8 +30,6 @@ might not be there at all. We may find `"12 Elizabeth Street"` or `"12 Elizabeth
 or `"12 Elizabeth Street VIC 3144"`.
 |-}
 
-type Box = Text
-
 newtype StreetName = StreetName Text deriving (Show, Eq, Ord)
 newtype StreetType = StreetType Text deriving (Show, Eq, Ord)
 
@@ -38,7 +37,11 @@ newtype City = City Text deriving (Show, Eq, Ord)
 newtype Postcode = Postcode Text deriving (Show, Eq, Ord)
 newtype State = State Text deriving (Show, Eq, Ord)
 
+type Box = Text
 data Pobox = Gpo Box | Po Box
+  deriving (Show, Eq, Ord)
+
+data Bag = Locked Box | Private Box
   deriving (Show, Eq, Ord)
 
 data StreetAddress = StAddr
@@ -86,6 +89,20 @@ poBox = do
 
 k :: Parser Text
 k = try $ text "k " <|> text "k,"
+
+bag :: Parser Bag
+bag = do
+  bt <- try $ text "locked" <|> text "private"
+  _ <- spaceOrStop
+  _ <- text "bag"
+  _ <- spaceOrStop
+  _ <- skipOptional $ (try (text "no") <|> text "n")
+  _ <- spaceOrStop
+  bn <- T.pack <$> some digit
+  case bt of
+    "locked"  -> return $ Locked bn
+    "private" -> return $ Private bn
+    _         -> unexpected $ "Locked or Private bag returned: " <> T.unpack bt
 
 streetAddress :: Parser StreetAddress
 streetAddress = do
