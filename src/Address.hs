@@ -95,7 +95,10 @@ streetAddress = do
   case th of
     Just t -> do
       _ <- spaces
-      sn <- takeUntilN 32 (try $ text "," <|> try aState <|> postcode)
+      sn <- takeUntilN 32 (try $ text ","
+                            <|> try (spaceOrComma' >> aState)
+                            <|> (spaceOrComma' >> postcode)
+                          )
       street n sn t
     Nothing -> do
       sn <- takeUntilN 32 $ T.pack <$> boundedStreetType -- street name

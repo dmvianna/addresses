@@ -117,13 +117,18 @@ main = hspec $ do
                      }
       actual `shouldBe` Success expected
     it "fails on empty street name" $ do
-      case parseByteString step mempty "R6 and R7 the same or different" of
+      case parseByteString step mempty "r6 and r7 the same or different" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
         Success actual             -> fail $ "this test should fail: " ++ show actual
-    -- it "fails on street number padded by zero" $ do
-    --   case parseByteString step mempty "formula 1 .00002 the of .00002" of
-    --     Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
-    --     Success actual             -> fail $ "this test should fail: " ++ show actual
+    it "fails on street number padded by zero" $ do
+      case parseByteString step mempty "formula 1 .00002 the of .00002" of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 30 30]"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
+    it "fails on neverending the" $ do
+      case parseByteString step mempty
+        " 1 the claims defining the invention are as follows:" of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 52 52]"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
 
   describe "street number" $ do
     it "parses single street number" $ do
