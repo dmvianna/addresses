@@ -110,12 +110,12 @@ streetAddress = do
     Just t -> do
       _ <- spaces
       sn <- takeUntilN 32 (try $ text ","
-                            <|> try (spaceOrComma' >> aState)
-                            <|> (spaceOrComma' >> postcode)
+                            <|> try (spaceOrComma' >> aState >> spaceOrComma')
+                            <|> (spaceOrComma' >> postcode >> spaceOrComma')
                           )
       street n sn t
     Nothing -> do
-      sn <- takeUntilN 32 $ T.pack <$> boundedStreetType -- street name
+      sn <- takeUntilN 32 $ boundedStreetType -- street name
       _ <- spaceOrComma
       t <- aStreetType
       street n sn t

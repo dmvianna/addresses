@@ -12,17 +12,17 @@ import           Text.Parser.LookAhead
 import           Text.RawString.QQ
 import           Text.Trifecta
 
-spaceOrStop :: Parser String
-spaceOrStop = many $ oneOf " ."
+spaceOrStop :: Parser Text
+spaceOrStop = T.pack <$> (many $ oneOf " .")
 
-spaceOrStop' :: Parser String
-spaceOrStop' = some $ oneOf " ."
+spaceOrStop' :: Parser Text
+spaceOrStop' = T.pack <$> (some $ oneOf " .")
 
-spaceOrComma :: Parser String
-spaceOrComma = many $ oneOf " ,"
+spaceOrComma :: Parser Text
+spaceOrComma = T.pack <$> (many $ oneOf " ,")
 
-spaceOrComma' :: Parser String
-spaceOrComma' = some $ oneOf " ,"
+spaceOrComma' :: Parser Text
+spaceOrComma' = T.pack <$> (some $ oneOf " ,")
 
 
 skipUntil :: Parser Text -> Parser Text
