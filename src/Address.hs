@@ -14,6 +14,7 @@ import           Text.RawString.QQ
 import           Text.Trifecta
 
 import           Components
+import           Locality
 import           StreetNumber
 
 {-|
@@ -33,10 +34,6 @@ or `"12 Elizabeth Street VIC 3144"`.
 newtype StreetName = StreetName Text deriving (Show, Eq, Ord)
 newtype StreetType = StreetType Text deriving (Show, Eq, Ord)
 
-newtype City = City Text deriving (Show, Eq, Ord)
-newtype Postcode = Postcode Text deriving (Show, Eq, Ord)
-newtype State = State Text deriving (Show, Eq, Ord)
-
 type Box = Text
 data Pobox = Gpo Box | Po Box
   deriving (Show, Eq, Ord)
@@ -45,19 +42,19 @@ data Bag = Locked Box | Private Box
   deriving (Show, Eq, Ord)
 
 data StreetAddress = StAddr
-  { getStreetNumber :: StreetNumber
-  , getStreetName   :: StreetName
-  , getStreetType   :: StreetType
+  { _streetNumber :: StreetNumber
+  , _streetName   :: StreetName
+  , _streetType   :: StreetType
   } deriving (Show, Eq, Ord)
 
 data AddressLocation = APobox Pobox | AStreetAddress StreetAddress
   deriving (Show, Eq, Ord)
 
 data Address = Address
-  { getAddressLocation :: AddressLocation
-  , getCity            :: City
-  , getState           :: State
-  , getPostcode        :: Postcode
+  { _addressLocation :: AddressLocation
+  , _suburb          :: Suburb
+  , _postcode        :: Postcode
+  , _state           :: State
   } deriving (Show, Eq, Ord)
 
 addressLocation :: Parser AddressLocation

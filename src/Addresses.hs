@@ -34,9 +34,6 @@ module Addresses
     , Box
     , StreetName
     , StreetType
-    , City
-    , Postcode
-    , State
     , Pobox(..)
     , StreetAddress
     , AddressLocation(..)
@@ -45,8 +42,14 @@ module Addresses
     , step
     , poBox
     , streetAddress
+
+    , Suburb(..)
+    , Postcode(..)
+    , State(..)
+    -- , Locality(..)
     ) where
 
 import           Address
 import           Components
+import           Locality
 import           StreetNumber

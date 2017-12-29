@@ -116,12 +116,12 @@ main = hspec $ do
     it "finds street address within text" $ do
       let actual = parseByteString step mempty "at 343-400 amazing street newfoundland"
           expected = AStreetAddress $ StAddr
-                     { getStreetNumber =
+                     { _streetNumber =
                          Range
                          (Single (Prefix "") (Number "343") (Suffix ""))
                          (Single (Prefix "") (Number "400") (Suffix ""))
-                     , getStreetName = StreetName "amazing"
-                     , getStreetType = StreetType "street"
+                     , _streetName = StreetName "amazing"
+                     , _streetType = StreetType "street"
                      }
       actual `shouldBe` Success expected
     it "fails on empty street name" $ do
