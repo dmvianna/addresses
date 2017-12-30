@@ -114,12 +114,19 @@ main = hspec $ do
 
   describe "large example" $ do
     it "finds PO Box within text" $ do
-      let actual = parseByteString step mempty addEx
-                   --"at gpo box 3898 k sydney nsw and"
-          expected = APobox $ Gpo "3898"
+      let actual = parseByteString (step auAddress) mempty addEx
+                   --"on, gpo box 3898, sydney nsw 2001 (57)"
+          expected =
+            AuAddress
+            (APobox $ Gpo "3898")
+            (Locality
+              { _suburb = Suburb "sydney"
+              , _state = State "nsw"
+              , _postcode = Postcode "2001"
+              })
       actual `shouldBe` Success expected
     it "finds street address within text" $ do
-      let actual = parseByteString step mempty "at 343-400 amazing street newfoundland"
+      let actual = parseByteString (step addressLocation) mempty "at 343-400 amazing street newfoundland"
           expected = AStreetAddress $ StAddr
                      { _streetNumber =
                          Range
@@ -130,15 +137,15 @@ main = hspec $ do
                      }
       actual `shouldBe` Success expected
     it "fails on empty street name" $ do
-      case parseByteString step mempty "r6 and r7 the same or different" of
+      case parseByteString (step addressLocation) mempty "r6 and r7 the same or different" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 31 31]"
         Success actual             -> fail $ "this test should fail: " ++ show actual
     it "fails on street number padded by zero" $ do
-      case parseByteString step mempty "formula 1 .00002 the of .00002" of
+      case parseByteString (step addressLocation) mempty "formula 1 .00002 the of .00002" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 30 30]"
         Success actual             -> fail $ "this test should fail: " ++ show actual
     it "fails on neverending the" $ do
-      case parseByteString step mempty
+      case parseByteString (step addressLocation) mempty
         " 1 the claims defining the invention are as follows:" of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 52 52]"
         Success actual             -> fail $ "this test should fail: " ++ show actual

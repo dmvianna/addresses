@@ -53,12 +53,12 @@ data AddressLocation =
   | AStreetAddress StreetAddress
   deriving (Show, Eq, Ord)
 
-data Address = Address
-  { _addressLocation :: AddressLocation
-  , _suburb          :: Suburb
-  , _postcode        :: Postcode
-  , _state           :: State
-  } deriving (Show, Eq, Ord)
+-- data Address = Address
+--   { _addressLocation :: AddressLocation
+--   , _suburb          :: Suburb
+--   , _postcode        :: Postcode
+--   , _state           :: State
+--   } deriving (Show, Eq, Ord)
 
 addressLocation :: Parser AddressLocation
 addressLocation =
@@ -66,10 +66,10 @@ addressLocation =
   <|> try (bag >>= return . ABag)
   <|> (streetAddress >>= return . AStreetAddress)
 
-step :: Parser AddressLocation
-step = do
+step :: Parser a -> Parser a
+step p = do
   _ <- anyChar
-  try addressLocation <|> step
+  try p <|> step p
 
 poBox :: Parser Pobox
 poBox = do
