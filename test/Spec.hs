@@ -10,6 +10,7 @@ import           Text.Trifecta
 
 import           Address           hiding (main)
 import           Components        hiding (main)
+import           Locality          hiding (main)
 import           StreetNumber      hiding (main)
 
 instance Eq a => Eq (Result a) where
@@ -156,4 +157,14 @@ main = hspec $ do
     it "fails on malformed range street number" $ do
       case parseByteString streetNumber mempty "12B-C " of
         Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 3 3]"
+        Success actual             -> fail $ "this test should fail: " ++ show actual
+
+  describe "locality" $ do
+    it "parses locality" $ do
+      let actual = parseByteString locality mempty "melbourne vic 3000 "
+          expected = Locality (Suburb "melbourne") (State "vic") (Postcode "3000")
+      actual `shouldBe` Success expected
+    it "fails on malformed state" $ do
+      case parseByteString locality mempty "melbourne vict 3000 " of
+        Failure (ErrInfo _ actual) -> show actual `shouldBe` "[Columns 20 20]"
         Success actual             -> fail $ "this test should fail: " ++ show actual

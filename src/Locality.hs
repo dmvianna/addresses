@@ -24,7 +24,7 @@ data Locality = Locality
   { _suburb   :: Suburb
   , _state    :: State
   , _postcode :: Postcode
-  }
+  } deriving (Show, Eq, Ord)
 
 locality :: Parser Locality
 locality = do
