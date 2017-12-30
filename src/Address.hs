@@ -126,3 +126,18 @@ streetAddress = do
       else unexpected "street with no name"
     boundedStreetType =
       spaceOrComma >> aStreetType >> spaceOrComma'
+
+
+data AuAddress = AuAddress
+  { _addrLocation :: AddressLocation
+  , _addrLocality :: Locality
+  }
+  deriving (Show, Eq, Ord)
+
+auAddress :: Parser AuAddress
+auAddress = do
+  alocn <- addressLocation
+  _ <- spaceOrComma'
+  alocl <- locality
+  pure $ AuAddress { _addrLocation = alocn
+                   , _addrLocality = alocl }
