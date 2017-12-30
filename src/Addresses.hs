@@ -31,22 +31,26 @@ module Addresses
     , rangeNumber
     , streetNumber
 
-    , Box
-    , StreetName
-    , StreetType
+    , Bag(..)
+    , Box(..)
+    , StreetName(..)
+    , StreetType(..)
     , Pobox(..)
-    , StreetAddress
+    , StreetAddress(..)
     , AddressLocation(..)
-    , Address
+    , AuAddress(..)
     , addressLocation
     , step
     , poBox
+    , bag
     , streetAddress
+    , auAddress
 
     , Suburb(..)
-    , Postcode(..)
     , State(..)
-    -- , Locality(..)
+    , Postcode(..)
+    , Locality(..)
+    , locality
     ) where
 
 import           Address
