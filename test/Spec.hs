@@ -107,6 +107,10 @@ main = hspec $ do
       let actual = parseByteString addressLocation mempty "gpo box 1234 k"
           expected = APobox $ Gpo "1234"
       actual `shouldBe` Success expected
+    it "chooses bags" $ do
+      let actual = parseByteString addressLocation mempty "locked bag 1234 k"
+          expected = ABag $ Locked "1234"
+      actual `shouldBe` Success expected
 
   describe "large example" $ do
     it "finds PO Box within text" $ do

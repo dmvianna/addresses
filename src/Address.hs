@@ -47,7 +47,10 @@ data StreetAddress = StAddr
   , _streetType   :: StreetType
   } deriving (Show, Eq, Ord)
 
-data AddressLocation = APobox Pobox | AStreetAddress StreetAddress
+data AddressLocation =
+  APobox Pobox
+  | ABag Bag
+  | AStreetAddress StreetAddress
   deriving (Show, Eq, Ord)
 
 data Address = Address
@@ -60,6 +63,7 @@ data Address = Address
 addressLocation :: Parser AddressLocation
 addressLocation =
   try (poBox >>= return . APobox)
+  <|> try (bag >>= return . ABag)
   <|> (streetAddress >>= return . AStreetAddress)
 
 step :: Parser AddressLocation
