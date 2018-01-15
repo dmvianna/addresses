@@ -53,13 +53,6 @@ data AddressLocation =
   | AStreetAddress StreetAddress
   deriving (Show, Eq, Ord)
 
--- data Address = Address
---   { _addressLocation :: AddressLocation
---   , _suburb          :: Suburb
---   , _postcode        :: Postcode
---   , _state           :: State
---   } deriving (Show, Eq, Ord)
-
 addressLocation :: Parser AddressLocation
 addressLocation =
   try (poBox >>= return . APobox)

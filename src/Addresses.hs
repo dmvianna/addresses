@@ -19,11 +19,11 @@ module Addresses
     , skipUntilN
     , takeUntilN
 
-    , Suffix
-    , Prefix
-    , Number
-    , Single
-    , StreetNumber
+    , Suffix(..)
+    , Prefix(..)
+    , Number(..)
+    , Single(..)
+    , StreetNumber(..)
     , singleNumber
     , singleFix
     , single
