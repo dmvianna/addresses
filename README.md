@@ -19,3 +19,16 @@ This is my attempt at one. I'm building a library based on [Haskell](https://has
 ## The current state:
 
 I'm not there yet. This is my initial attempt. Be aware that I'm a beginner Haskeller, so this implementation is a reflection of my current skills.
+
+## On Nix
+
+- run `nix-shell` to get a nix environment. The workflow used to create `default.nix` and `addresses.nix` was:
+  ```bash
+  $ cabal2nix ./ > addresses.nix
+  $ cabal2nix ./ --shell > default.nix
+  ```
+  Then in `default.nix` replace the function call `f` with `import ./addresses.nix`; also optionally add development dependencies such a local hoogle server and `ghcid`.
+
+- run `hoogle server --local` and point your browser to `localhost:8080`. You get hoogle to work offline for documentation on the packages used in this project!
+
+- run `ghcid -c cabal new-repl` to run ghcid without stack.
